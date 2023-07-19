@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ShopDao">
+  
+<insert id="INSERT" parameterType="member">
+insert  into  member_tbl_02 (custNo, custName, phone, zipcode, address, address2, joindate, grade, city, id, password)
+values (#{custNo}, #{custName}, #{phone}, #{zipcode}, #{address}, #{address2}, #{joindateStr}, #{grade}, #{city}, #{id}, #{password})
+</insert>
+
+<update id="UPDATE" parameterType="member">
+update member_tbl_02 set custName=#{custName}, phone=#{phone}, zipcode=#{zipcode}, address=#{address}, address2=#{address2}, joindate=#{joindateStr}, grade=#{grade}, city=#{city} 
+ where custNo=#{custNo}
+</update>
+
+<select id="SELECTALL" resultType="member">
+select * from member_tbl_02 where 1=1 
+<if test="ch1=='custName'">
+	and custName like '%'||#{ch2}||'%' 
+</if>
+<if test="ch1=='phone'">
+	and phone like '%'||#{ch2}||'%' 
+</if>
+<if test="ch1=='address'">
+	and address like '%'||#{ch2}||'%' 
+</if>
+order by custNo desc
+</select>
+
+<select id="EDIT" resultType="member" parameterType="member">
+select * from member_tbl_02 where custNo=#{custNo}
+</select>
+
+<select id="CUSTNO" resultType="int">
+select max(custNo)+1 as custNo from member_tbl_02
+</select>
+
+<select id="MONEY" resultType="money">
+<![CDATA[
+select m1.custNo, custName, grade, nvl(sum(price),0) price from member_tbl_02 m1 
+left join money_tbl_02 m2
+on m1.custNo=m2.custNo
+group by m1.custNo, custName, grade
+having sum(price) >= 3000
+order by price desc
+]]>
+</select>
+
+<select id="IDCK" resultType="String" parameterType="member">
+select id from member_tbl_02 where id=#{id}
+</select>
+
+<select id="LOGIN" resultType="member" parameterType="member">
+select * from member_tbl_02 where id=#{id}
+</select>
+
+
+
+</mapper>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CART">
+  
+<insert id="INSERT" parameterType="cart">
+insert into CartTBL(cartId, custNo, productId, amount)
+values (seq_CartTBL.nextval, #{custNo}, #{productId}, #{amount})
+</insert>
+
+<insert id="ORDERJUMUNSEO" parameterType="orderjumunseo">
+insert into orderJumunseo (idx, custNo, cartId, productId, productName, amount, orderG)
+values (seq_CartTBL.nextval, #{custNo}, #{cartId}, #{productId}, #{productName}, #{amount}, #{orderG})
+</insert>
+
+<insert id="ORDERMONEY" parameterType="ordermoney">
+insert into orderMoney(idx, custNo, baesongbi, totalmoney)
+values (seq_CartTBL.nextval, #{OcustNo}, #{baesongbi}, #{totalmoney})
+</insert>
+
+<select id="ORDERG" resultType="int" parameterType="ordermoney">
+select max(idx) idx from orderMoney where custNo=#{OcustNo}
+</select>
+
+
+<select id="ORDERLIST" resultType="ordermoney">
+select idx, custNo as OcustNo, baesongbi, totalmoney, getDate from orderMoney order by idx desc
+</select>
+
+<select id="ORDERONE" resultType="orderone" parameterType="orderone">
+select M.baesongbi, M.totalmoney, M.getDate, M2.custName, M2.phone, M2.address, J.productName, J.productId, J.amount, J.orderG, J.idx 
+from orderMoney M join orderJumunseo J on M.idx = J.orderG 
+join member_TBL_02 M2 on M2.custNo= M.custNo 
+where M.idx=#{idx} order by M.idx desc
+</select>
+
+<delete id="DELETEONE" parameterType="cart">
+delete from CartTBL where cartId=#{cartId}
+</delete>
+
+<delete id="DELETEALL" parameterType="cart">
+delete from CartTBL where custNo=#{custNo}
+</delete>
+
+<update id="UPDATE" parameterType="cart">
+update CartTBL set amount=#{amount} where cartId=#{cartId}
+</update>
+
+<select id="SELECTALL" resultType="cart" parameterType="cart">
+select cartId, custNo, c1.productId as productId, productName, productPrice, productImg as productImgStr, amount
+from CartTBL c1 join productTBL p1 
+on c1.productId=p1.productId
+where custNo = #{custNo}
+</select>
+
+</mapper>
